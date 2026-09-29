@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱 Biblioteca Híbrida — Como Funciona por Dentro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #4c1d95 50%, #0f2027 100%);
+            padding: 20px 14px 80px;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f59e0b 100%);
+            border-radius: 20px;
+            padding: 35px 25px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            letter-spacing: -.5px;
+        }
+
+        .header h1 span {
+            color: #fef08a;
+        }
+
+        .header p {
+            opacity: .95;
+            font-size: 1rem;
+            max-width: 850px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .badge-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+
+        .badge {
+            background: rgba(255, 255, 255, .2);
+            padding: 5px 14px;
+            border-radius: 30px;
+            font-size: .72rem;
+            font-weight: 700;
+            color: #fff;
+            backdrop-filter: blur(5px);
+        }
+
+        /* CARDS */
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 26px;
+            margin-bottom: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .12);
+        }
+
+        .card h2 {
+            color: #7c3aed;
+            margin-bottom: 14px;
+            border-left: 5px solid #a855f7;
+            padding-left: 12px;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card h3 {
+            color: #1e1b4b;
+            margin: 22px 0 10px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card h4 {
+            color: #5b21b6;
+            margin: 14px 0 6px;
+            font-size: .98rem;
+        }
+
+        .card p {
+            color: #334155;
+            line-height: 1.75;
+            margin-bottom: 12px;
+            font-size: .94rem;
+        }
+
+        .card ul,
+        .card ol {
+            color: #334155;
+            line-height: 1.8;
+            margin: 8px 0 14px 25px;
+            font-size: .94rem;
+        }
+
+        .card code {
+            background: #ede9fe;
+            color: #6b21a8;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: .85rem;
+        }
+
+        .card pre {
+            background: #020617;
+            color: #e2e8f0;
+            padding: 14px 16px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: .8rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            margin: 10px 0;
+            white-space: pre;
+        }
+
+        /* HIGHLIGHT BOXES */
+        .highlight-box {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 14px 0;
+            font-size: .92rem;
+            line-height: 1.7;
+        }
+
+        .highlight-box.yellow {
+            background: #fffbe8;
+            border-left: 5px solid #f59e0b;
+            color: #854d0e;
+        }
+
+        .highlight-box.blue {
+            background: #e0f2fe;
+            border-left: 5px solid #0284c7;
+            color: #0369a1;
+        }
+
+        .highlight-box.green {
+            background: #dcfce7;
+            border-left: 5px solid #16a34a;
+            color: #15803d;
+        }
+
+        .highlight-box.purple {
+            background: #f3e8ff;
+            border-left: 5px solid #9333ea;
+            color: #6b21a8;
+        }
+
+        .highlight-box.red {
+            background: #fee2e2;
+            border-left: 5px solid #ef4444;
+            color: #991b1b;
+        }
+
+        /* GRID DE CONCEITOS */
+        .conceito-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin: 18px 0;
+        }
+
+        .conceito-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            transition: .2s;
+        }
+
+        .conceito-card:hover {
+            transform: translateY(-3px);
+            border-color: #a855f7;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, .15);
+        }
+
+        .conceito-card .tag {
+            font-size: .68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+            color: #a855f7;
+        }
+
+        .conceito-card h4 {
+            font-size: .95rem;
+            color: #1e1b4b;
+            margin-bottom: 6px;
+        }
+
+        .conceito-card p {
+            font-size: .82rem;
+            color: #64748b;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        /* FLUXO VISUAL */
+        .fluxo {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            margin: 16px 0;
+        }
+
+        .fluxo .etapa {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: .82rem;
+            font-weight: 700;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .fluxo .seta {
+            color: #a855f7;
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
+        /* TABELAS */
+        table.tabela {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 14px 0;
+            font-size: .88rem;
+        }
+
+        table.tabela th {
+            background: linear-gradient(135deg, #4c1d95, #7c3aed);
+            color: #fff;
+            padding: 11px 13px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table.tabela td {
+            padding: 11px 13px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+            vertical-align: top;
+        }
+
+        table.tabela tr:hover td {
+            background: #f8fafc;
+        }
+
+        /* DEMO INTERATIVA */
+        .demo {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 20px;
+            margin: 14px 0;
+            text-align: center;
+        }
+
+        .demo .titulo {
+            font-size: .72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin-bottom: 14px;
+        }
+
+        .demo button {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+            border: none;
+            padding: 12px 22px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: .9rem;
+            margin: 4px;
+            transition: .2s;
+        }
+
+        .demo button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(168, 85, 247, .35);
+        }
+
+        /* QUIZ */
+        .question {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid #a855f7;
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .question.tf {
+            border-left-color: #0284c7;
+        }
+
+        .question-header {
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: .93rem;
+            line-height: 1.5;
+        }
+
+        .question-number {
+            background: #a855f7;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .question.tf .question-number {
+            background: #0284c7;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .options.tf {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            max-width: 320px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: white;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .option:hover:not(.disabled) {
+            border-color: #a855f7;
+            background: #faf5ff;
+        }
+
+        .option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            flex-shrink: 0;
+            accent-color: #a855f7;
+        }
+
+        .option label {
+            font-size: .88rem;
+            cursor: pointer;
+            flex: 1;
+            line-height: 1.4;
+            color: #334155;
+        }
+
+        .option.correct {
+            border-color: #16a34a !important;
+            background: #dcfce7 !important;
+            font-weight: bold;
+        }
+
+        .option.wrong {
+            border-color: #dc2626 !important;
+            background: #fee2e2 !important;
+        }
+
+        .option.disabled {
+            cursor: default;
+        }
+
+        .btn-grupo {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: .92rem;
+            font-weight: 700;
+            transition: .2s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(168, 85, 247, .35);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .result-box {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            border: 3px solid #a855f7;
+            display: none;
+            margin-top: 24px;
+        }
+
+        .score {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #7c3aed;
+        }
+
+        .btn-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #a855f7;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .25);
+            font-family: inherit;
+            z-index: 100;
+        }
+
+        @media (max-width:650px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .card {
+                padding: 18px 14px;
+            }
+
+            .fluxo .etapa {
+                min-width: 90px;
+                font-size: .75rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="inicio">
+
+        <!-- HEADER -->
+        <header class="header">
+            <h1>📱 Biblioteca Híbrida — <span>Como Funciona por Dentro</span></h1>
+            <p>Entenda como uma aplicação híbrida acessa câmera, GPS, WhatsApp, SMS e compartilhamento do celular usando
+                HTML, CSS e JavaScript — sem precisar escrever código nativo Android ou iOS.</p>
+            <div class="badge-group">
+                <span class="badge">📷 Câmera</span>
+                <span class="badge">📍 Geolocalização</span>
+                <span class="badge">💬 WhatsApp</span>
+                <span class="badge">📩 SMS</span>
+                <span class="badge">📤 Compartilhar</span>
+                <span class="badge">🚀 Fluxo Integrado</span>
+            </div>
+        </header>
+
+        <!-- SEÇÃO 1: O QUE É UMA APLICAÇÃO HÍBRIDA -->
+        <section class="card">
+            <h2>🧩 1. O que é uma Aplicação Híbrida?</h2>
+
+            <div class="highlight-box purple">
+                💡 <strong>Conceito-chave:</strong> uma aplicação híbrida é um aplicativo mobile construído com
+                <strong>tecnologias web</strong> (HTML, CSS e JavaScript) que roda dentro de um contêiner nativo chamado
+                <strong>WebView</strong>. O WebView é uma janela que exibe sua página web <em>dentro</em> do aplicativo,
+                mas com acesso a recursos do celular.
+            </div>
+
+            <p>Diferente do navegador comum (Chrome, Safari), o WebView de um app híbrido pode ter acesso a
+                <strong>câmera, GPS, contatos, arquivos e microfone</strong> — porque o app nativo que o empacota
+                concede essas permissões.</p>
+
+            <h3>🏗️ As 3 camadas de uma aplicação híbrida</h3>
+            <div class="conceito-grid">
+                <div class="conceito-card">
+                    <span class="tag">Camada 1</span>
+                    <h4>🎨 Interface (Web)</h4>
+                    <p>HTML, CSS e JavaScript que o usuário vê. É aqui que ficam botões, formulários e chamadas às APIs
+                        Web.</p>
+                </div>
+                <div class="conceito-card">
+                    <span class="tag">Camada 2</span>
+                    <h4>🌉 Ponte (Bridge)</h4>
+                    <p>Camada que traduz chamadas do JavaScript para o sistema operacional. É aqui que frameworks como
+                        Capacitor, Cordova ou PhoneGap atuam.</p>
+                </div>
+                <div class="conceito-card">
+                    <span class="tag">Camada 3</span>
+                    <h4>🤖 Sistema Operacional</h4>
+                    <p>Android ou iOS. Fornece os sensores, câmeras, GPS e APIs nativas. Só aceita comandos da Bridge,
+                        não do JS diretamente.</p>
+                </div>
+            </div>
+
+            <h3>🔄 Como o JavaScript conversa com o hardware</h3>
+            <div class="fluxo">
+                <div class="etapa">Usuário clica<br>no botão</div>
+                <div class="seta">→</div>
+                <div class="etapa">JS chama<br>API Web</div>
+                <div class="seta">→</div>
+                <div class="etapa">WebView<br>repassa</div>
+                <div class="seta">→</div>
+                <div class="etapa">Bridge<br>traduz</div>
+                <div class="seta">→</div>
+                <div class="etapa">S.O. aciona<br>sensor</div>
+            </div>
+
+            <div class="highlight-box blue">
+                ⚙️ <strong>Importante:</strong> nem toda API Web precisa da Bridge. Algumas (como <code>wa.me</code> e
+                <code>sms:</code>) são apenas <em>links especiais</em> que o sistema operacional reconhece e abre no app
+                correspondente.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2: AS DUAS FORMAS DE ACESSAR SENSORES -->
+        <section class="card">
+            <h2>🔌 2. Como o app híbrido acessa os sensores do celular</h2>
+
+            <p>Existem <strong>duas grandes famílias</strong> de acesso a recursos do celular em aplicações híbridas:
+            </p>
+
+            <h3>🌐 Família 1 — APIs Web padrão (HTML5)</h3>
+            <p>São APIs definidas pelo <strong>W3C</strong> e suportadas pelos navegadores modernos. Não precisam de
+                instalação. Exemplos:</p>
+
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>API Web</th>
+                        <th>O que acessa</th>
+                        <th>Comando principal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>navigator.geolocation</code></td>
+                        <td>GPS / Localização</td>
+                        <td><code>getCurrentPosition()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>navigator.mediaDevices</code></td>
+                        <td>Câmera e microfone</td>
+                        <td><code>getUserMedia()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>input type="file"</code></td>
+                        <td>Câmera, galeria e arquivos</td>
+                        <td><code>capture="environment"</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>navigator.share</code></td>
+                        <td>Compartilhamento nativo</td>
+                        <td><code>navigator.share({...})</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>navigator.vibrate</code></td>
+                        <td>Vibração</td>
+                        <td><code>navigator.vibrate(200)</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>localStorage</code></td>
+                        <td>Armazenamento local</td>
+                        <td><code>setItem() / getItem()</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>Notification</code></td>
+                        <td>Notificações do sistema</td>
+                        <td><code>new Notification()</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>🌉 Família 2 — Plugins nativos (via Bridge)</h3>
+            <p>Quando a API Web não é suficiente (ex.: ler contatos, usar Bluetooth clássico, acessar arquivos do
+                sistema), usamos <strong>plugins nativos</strong> fornecidos pelos frameworks híbridos:</p>
+
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Framework</th>
+                        <th>Plugin / recurso</th>
+                        <th>O que acessa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Capacitor</strong></td>
+                        <td><code>@capacitor/camera</code></td>
+                        <td>Câmera nativa com controle total</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacitor</strong></td>
+                        <td><code>@capacitor/geolocation</code></td>
+                        <td>GPS com precisão nativa</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacitor</strong></td>
+                        <td><code>@capacitor/share</code></td>
+                        <td>Compartilhamento nativo</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Capacitor</strong></td>
+                        <td><code>@capacitor/filesystem</code></td>
+                        <td>Arquivos do aparelho</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cordova</strong></td>
+                        <td><code>cordova-plugin-camera</code></td>
+                        <td>Câmera (legado)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cordova</strong></td>
+                        <td><code>cordova-plugin-geolocation</code></td>
+                        <td>Geolocalização (legado)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box yellow">
+                ⚠️ <strong>Atenção:</strong> toda API sensível exige <strong>HTTPS</strong> ou
+                <strong>localhost</strong>. Em HTTP puro, o navegador bloqueia geolocalização, câmera (via getUserMedia)
+                e compartilhamento nativo. Câmera via <code>input file</code>, WhatsApp e SMS funcionam mesmo em HTTP.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 3: EXEMPLO 1 — CÂMERA -->
+        <section class="card">
+            <h2>📷 3. Exemplo 1 — Câmera (input type="file")</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> não usamos <code>getUserMedia</code>. Usamos um
+                <code>&lt;input type="file"&gt;</code> com o atributo <code>capture</code>. O sistema operacional abre o
+                <strong>app nativo de câmera</strong> e devolve a foto como arquivo.
+            </div>
+
+            <h3>🎯 Comandos principais</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>accept="image/*"</code></td>
+                        <td>Aceita apenas imagens</td>
+                    </tr>
+                    <tr>
+                        <td><code>capture="environment"</code></td>
+                        <td>Abre câmera traseira</td>
+                    </tr>
+                    <tr>
+                        <td><code>capture="user"</code></td>
+                        <td>Abre câmera frontal (selfie)</td>
+                    </tr>
+                    <tr>
+                        <td><code>input.files[0]</code></td>
+                        <td>Pega o arquivo escolhido</td>
+                    </tr>
+                    <tr>
+                        <td><code>new FileReader()</code></td>
+                        <td>Lê o arquivo como dados</td>
+                    </tr>
+                    <tr>
+                        <td><code>reader.readAsDataURL()</code></td>
+                        <td>Converte a imagem em base64</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Estrutura do código</h3>
+            <pre>&lt;input type="file" accept="image/*" capture="environment"&gt;
+
+&lt;script&gt;
+  const input = document.querySelector('input');
+  input.addEventListener('change', function() {
+    const arquivo = input.files[0];
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+      document.getElementById('preview').src = e.target.result;
+    };
+    leitor.readAsDataURL(arquivo);
+  });
+&lt;/script&gt;</pre>
+
+            <div class="highlight-box blue">
+                🔐 <strong>HTTPS?</strong> Não exige. O <code>input file</code> funciona em qualquer origem, porque o
+                arquivo é escolhido diretamente pelo usuário.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4: EXEMPLO 2 — GEOLOCALIZAÇÃO -->
+        <section class="card">
+            <h2>📍 4. Exemplo 2 — Geolocalização (GPS)</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> a API <code>navigator.geolocation</code> pergunta ao sistema
+                operacional a posição atual. O S.O. usa GPS + Wi-Fi + torres de celular para calcular latitude,
+                longitude e precisão.
+            </div>
+
+            <h3>🎯 Comandos principais</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>navigator.geolocation.getCurrentPosition()</code></td>
+                        <td>Obtém a posição uma vez</td>
+                    </tr>
+                    <tr>
+                        <td><code>watchPosition()</code></td>
+                        <td>Monitora a posição continuamente</td>
+                    </tr>
+                    <tr>
+                        <td><code>pos.coords.latitude</code></td>
+                        <td>Latitude</td>
+                    </tr>
+                    <tr>
+                        <td><code>pos.coords.longitude</code></td>
+                        <td>Longitude</td>
+                    </tr>
+                    <tr>
+                        <td><code>pos.coords.accuracy</code></td>
+                        <td>Precisão em metros</td>
+                    </tr>
+                    <tr>
+                        <td><code>enableHighAccuracy: true</code></td>
+                        <td>Força uso do GPS</td>
+                    </tr>
+                    <tr>
+                        <td><code>timeout: 10000</code></td>
+                        <td>Tempo máximo de espera</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Estrutura do código</h3>
+            <pre>navigator.geolocation.getCurrentPosition(
+  function(pos) {
+    console.log("Lat:", pos.coords.latitude);
+    console.log("Lon:", pos.coords.longitude);
+    console.log("Precisão:", pos.coords.accuracy, "m");
+  },
+  function(erro) {
+    console.log("Erro:", erro.message);
+  },
+  { enableHighAccuracy: true, timeout: 10000 }
+);</pre>
+
+            <div class="highlight-box red">
+                ⚠️ <strong>HTTPS obrigatório.</strong> Em <code>file://</code> ou <code>http://</code>, o navegador
+                bloqueia a geolocalização. Use <strong>https</strong>, <strong>localhost</strong> ou ferramentas como
+                <strong>ngrok</strong>.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 5: EXEMPLO 3 — DISTÂNCIA ENTRE PONTOS -->
+        <section class="card">
+            <h2>📏 5. Exemplo 3 — Cálculo de Distância entre Dois Pontos</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> usamos a <strong>Fórmula de Haversine</strong> para calcular a
+                distância entre duas coordenadas geográficas na superfície da Terra. Não é uma API do celular — é pura
+                matemática em JavaScript.
+            </div>
+
+            <h3>🎯 Fórmula de Haversine</h3>
+            <pre>const R = 6371; // raio da Terra em km
+const dLat = (latB - latA) * Math.PI / 180;
+const dLon = (lonB - lonA) * Math.PI / 180;
+
+const a =
+  Math.sin(dLat/2) ** 2 +
+  Math.cos(latA * Math.PI/180) *
+  Math.cos(latB * Math.PI/180) *
+  Math.sin(dLon/2) ** 2;
+
+const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+const distancia = R * c; // km</pre>
+
+            <h3>📊 Comandos usados</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>parseFloat()</code></td>
+                        <td>Converte texto em número decimal</td>
+                    </tr>
+                    <tr>
+                        <td><code>Math.sin() / Math.cos()</code></td>
+                        <td>Funções trigonométricas</td>
+                    </tr>
+                    <tr>
+                        <td><code>Math.atan2()</code></td>
+                        <td>Arco tangente de dois valores</td>
+                    </tr>
+                    <tr>
+                        <td><code>Math.sqrt()</code></td>
+                        <td>Raiz quadrada</td>
+                    </tr>
+                    <tr>
+                        <td><code>.toFixed(2)</code></td>
+                        <td>Formata com 2 casas decimais</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box blue">
+                💼 <strong>Uso real:</strong> apps de entrega (iFood, Uber), check-in em eventos, cálculo de frete,
+                proximidade de lojas.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 6: EXEMPLO 4 — WHATSAPP -->
+        <section class="card">
+            <h2>💬 6. Exemplo 4 — Acionar WhatsApp por Link</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> o WhatsApp registra no sistema operacional um <em>esquema de URL</em>
+                (<code>https://wa.me/</code>). Quando o navegador abre esse link, o S.O. redireciona automaticamente
+                para o app do WhatsApp.
+            </div>
+
+            <h3>🎯 Formato do link</h3>
+            <pre>https://wa.me/5532999999999?text=Ol%C3%A1%2C%20tudo%20bem%3F
+
+// Estrutura:
+// https://wa.me/NUMERO?text=MENSAGEM_URL_ENCODED
+// Número deve ter DDI + DDD, sem espaços nem traços</pre>
+
+            <h3>📊 Comandos usados</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>.replace(/\D/g, "")</code></td>
+                        <td>Remove tudo que não for número</td>
+                    </tr>
+                    <tr>
+                        <td><code>encodeURIComponent()</code></td>
+                        <td>Codifica a mensagem para URL</td>
+                    </tr>
+                    <tr>
+                        <td><code>window.open(url, "_blank")</code></td>
+                        <td>Abre em nova aba/app</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Código essencial</h3>
+            <pre>const numero = "5532999999999";
+const msg = "Olá, tudo bem?";
+const url = "https://wa.me/" + numero + "?text=" + encodeURIComponent(msg);
+window.open(url, "_blank");</pre>
+
+            <div class="highlight-box blue">
+                🔐 <strong>HTTPS?</strong> Não exige. Funciona em qualquer origem, porque é apenas um link.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 7: EXEMPLO 5 — SMS -->
+        <section class="card">
+            <h2>📩 7. Exemplo 5 — Enviar SMS</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> usamos o esquema <code>sms:</code>. O sistema operacional reconhece
+                esse formato e abre o app nativo de mensagens já com número e texto pré-preenchidos.
+            </div>
+
+            <h3>🎯 Formato do link</h3>
+            <pre>// Android:
+sms:32999999999?body=Olá,%20tudo%20bem?
+
+// iOS (usa & em vez de ?):
+sms:32999999999&body=Olá,%20tudo%20bem?</pre>
+
+            <h3>📊 Comandos usados</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>/iPad|iPhone|iPod/.test(navigator.userAgent)</code></td>
+                        <td>Detecta iOS</td>
+                    </tr>
+                    <tr>
+                        <td><code>window.location.href = url</code></td>
+                        <td>Abre o app de SMS</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Código essencial</h3>
+            <pre>const numero = "32999999999";
+const msg = "Olá! Vim pelo site.";
+const ehIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const sep = ehIOS ? "&" : "?";
+const url = "sms:" + numero + sep + "body=" + encodeURIComponent(msg);
+window.location.href = url;</pre>
+
+            <div class="highlight-box yellow">
+                ⚠️ O SMS <strong>não é enviado automaticamente</strong>. O usuário precisa tocar em "Enviar" no app de
+                mensagens. Isso é uma proteção contra spam.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 8: EXEMPLO 6 — COMPARTILHAR -->
+        <section class="card">
+            <h2>📤 8. Exemplo 6 — Compartilhar (Web Share API)</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> a <strong>Web Share API</strong> abre o menu nativo de
+                compartilhamento do celular (WhatsApp, Telegram, e-mail, etc.). É uma API padronizada pelo W3C,
+                suportada por Chrome Android e Safari iOS.
+            </div>
+
+            <h3>🎯 Comandos principais</h3>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Comando</th>
+                        <th>Função</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>navigator.share(dados)</code></td>
+                        <td>Abre o menu nativo</td>
+                    </tr>
+                    <tr>
+                        <td><code>navigator.canShare(dados)</code></td>
+                        <td>Verifica se o conteúdo pode ser compartilhado</td>
+                    </tr>
+                    <tr>
+                        <td><code>dados.title</code></td>
+                        <td>Título do compartilhamento</td>
+                    </tr>
+                    <tr>
+                        <td><code>dados.text</code></td>
+                        <td>Texto</td>
+                    </tr>
+                    <tr>
+                        <td><code>dados.url</code></td>
+                        <td>URL</td>
+                    </tr>
+                    <tr>
+                        <td><code>dados.files</code></td>
+                        <td>Arquivos (imagens, PDFs)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>💻 Código essencial</h3>
+            <pre>navigator.share({
+  title: "Promoção Especial",
+  text: "Aproveite 30% de desconto!",
+  url: "https://meusite.com"
+})
+.then(() => console.log("Compartilhado!"))
+.catch((erro) => console.log("Cancelado:", erro));</pre>
+
+            <div class="highlight-box red">
+                ⚠️ <strong>HTTPS obrigatório.</strong> A Web Share API só funciona em HTTPS ou localhost.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 9: EXEMPLO 7 — FLUXO INTEGRADO -->
+        <section class="card">
+            <h2>🚀 9. Exemplo 7 — Fluxo Integrado (GPS + WhatsApp)</h2>
+
+            <div class="highlight-box green">
+                💡 <strong>Como funciona:</strong> combinamos <strong>3 APIs</strong> em um único fluxo: leitura de
+                campos (<code>input</code>), captura de GPS (<code>geolocation</code>) e envio por WhatsApp
+                (<code>wa.me</code>).
+            </div>
+
+            <h3>🔄 Fluxo passo a passo</h3>
+            <div class="fluxo">
+                <div class="etapa">Usuário<br>preenche</div>
+                <div class="seta">→</div>
+                <div class="etapa">GPS<br>captura</div>
+                <div class="seta">→</div>
+                <div class="etapa">JS monta<br>mensagem</div>
+                <div class="seta">→</div>
+                <div class="etapa">WhatsApp<br>recebe</div>
+            </div>
+
+            <h3>💻 Código resumido</h3>
+            <pre>// 1. Captura GPS
+navigator.geolocation.getCurrentPosition(function(pos) {
+  const lat = pos.coords.latitude.toFixed(6);
+  const lon = pos.coords.longitude.toFixed(6);
+
+  // 2. Monta a mensagem
+  const nome = document.getElementById("nome").value;
+  const pedido = document.getElementById("pedido").value;
+  const msg = "Olá! Meu nome é " + nome +
+              ". Pedido: " + pedido +
+              ". Localização: https://www.google.com/maps?q=" + lat + "," + lon;
+
+  // 3. Envia por WhatsApp
+  const url = "https://wa.me/5532999999999?text=" + encodeURIComponent(msg);
+  window.open(url, "_blank");
+});</pre>
+
+            <div class="highlight-box blue">
+                💼 <strong>Uso real:</strong> apps de delivery, assistência técnica, chamados de emergência, pedidos em
+                feiras e food trucks.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 10: TABELA RESUMO -->
+        <section class="card">
+            <h2>📊 10. Tabela Resumo — Todas as APIs</h2>
+            <table class="tabela">
+                <thead>
+                    <tr>
+                        <th>Exemplo</th>
+                        <th>API / Comando</th>
+                        <th>HTTPS?</th>
+                        <th>Sensor acessado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>📷 Câmera</td>
+                        <td><code>input file + capture</code></td>
+                        <td>Não</td>
+                        <td>Câmera nativa</td>
+                    </tr>
+                    <tr>
+                        <td>📍 GPS</td>
+                        <td><code>navigator.geolocation</code></td>
+                        <td>Sim</td>
+                        <td>GPS + Wi-Fi</td>
+                    </tr>
+                    <tr>
+                        <td>📏 Distância</td>
+                        <td>Haversine (matemática)</td>
+                        <td>Não</td>
+                        <td>Nenhum</td>
+                    </tr>
+                    <tr>
+                        <td>💬 WhatsApp</td>
+                        <td><code>https://wa.me/</code></td>
+                        <td>Não</td>
+                        <td>App externo</td>
+                    </tr>
+                    <tr>
+                        <td>📩 SMS</td>
+                        <td><code>sms:numero?body=</code></td>
+                        <td>Não</td>
+                        <td>App externo</td>
+                    </tr>
+                    <tr>
+                        <td>📤 Compartilhar</td>
+                        <td><code>navigator.share</code></td>
+                        <td>Sim</td>
+                        <td>Menu nativo</td>
+                    </tr>
+                    <tr>
+                        <td>🚀 Integrado</td>
+                        <td>GPS + WhatsApp</td>
+                        <td>Sim (por GPS)</td>
+                        <td>GPS + app externo</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- SEÇÃO 11: QUIZ -->
+        <section class="card" id="sec-quiz">
+            <h2>📝 11. Questionário de Fixação (15 Questões)</h2>
+            <p>Responda às questões e clique em "Verificar Respostas" para ver sua pontuação:</p>
+
+            <form id="formQuiz">
+                <!-- Q1 -->
+                <div class="question" id="q1">
+                    <div class="question-header">
+                        <span class="question-number">1</span>
+                        O que é uma aplicação híbrida?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q1" value="A"><label>Um app escrito apenas em
+                                Kotlin e Java</label></div>
+                        <div class="option"><input type="radio" name="q1" value="B"><label>Um app feito com HTML/CSS/JS
+                                rodando dentro de um WebView</label></div>
+                        <div class="option"><input type="radio" name="q1" value="C"><label>Um app que só funciona no
+                                navegador do computador</label></div>
+                        <div class="option"><input type="radio" name="q1" value="D"><label>Um sistema operacional para
+                                celulares</label></div>
+                    </div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="question" id="q2">
+                    <div class="question-header">
+                        <span class="question-number">2</span>
+                        Qual é a função do WebView em uma aplicação híbrida?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q2" value="A"><label>Renderizar HTML/CSS/JS dentro
+                                do app nativo</label></div>
+                        <div class="option"><input type="radio" name="q2" value="B"><label>Compilar código Java para
+                                Android</label></div>
+                        <div class="option"><input type="radio" name="q2" value="C"><label>Armazenar arquivos no
+                                servidor</label></div>
+                        <div class="option"><input type="radio" name="q2" value="D"><label>Bloquear o acesso à
+                                internet</label></div>
+                    </div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="question" id="q3">
+                    <div class="question-header">
+                        <span class="question-number">3</span>
+                        Qual API Web é usada para capturar a localização do usuário?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q3" value="A"><label>navigator.camera</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q3" value="B"><label>navigator.geolocation</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q3" value="C"><label>navigator.share</label></div>
+                        <div class="option"><input type="radio" name="q3" value="D"><label>navigator.storage</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="question" id="q4">
+                    <div class="question-header">
+                        <span class="question-number">4</span>
+                        Como abrimos a câmera traseira do celular em um app híbrido?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q4" value="A"><label>Usando capture="user"</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q4" value="B"><label>Usando
+                                capture="environment"</label></div>
+                        <div class="option"><input type="radio" name="q4" value="C"><label>Usando capture="rear"</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q4" value="D"><label>Usando capture="back"</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="question" id="q5">
+                    <div class="question-header">
+                        <span class="question-number">5</span>
+                        Qual comando converte a imagem capturada em uma string base64?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q5" value="A"><label>reader.readAsText()</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q5"
+                                value="B"><label>reader.readAsDataURL()</label></div>
+                        <div class="option"><input type="radio" name="q5" value="C"><label>reader.readAsBinary()</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q5" value="D"><label>reader.readAsImage()</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="question" id="q6">
+                    <div class="question-header">
+                        <span class="question-number">6</span>
+                        Por que a API de geolocalização exige HTTPS?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q6" value="A"><label>Porque é mais bonito</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q6" value="B"><label>Por segurança: a localização
+                                é um dado sensível</label></div>
+                        <div class="option"><input type="radio" name="q6" value="C"><label>Porque o GPS só funciona à
+                                noite</label></div>
+                        <div class="option"><input type="radio" name="q6" value="D"><label>Porque o navegador não sabe
+                                ler latitude</label></div>
+                    </div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="question" id="q7">
+                    <div class="question-header">
+                        <span class="question-number">7</span>
+                        Qual é o formato correto do link do WhatsApp?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q7"
+                                value="A"><label>https://whatsapp.com/send</label></div>
+                        <div class="option"><input type="radio" name="q7"
+                                value="B"><label>https://wa.me/NUMERO?text=MENSAGEM</label></div>
+                        <div class="option"><input type="radio" name="q7" value="C"><label>whatsapp://numero</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q7" value="D"><label>https://zap.me/NUMERO</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="question" id="q8">
+                    <div class="question-header">
+                        <span class="question-number">8</span>
+                        No link do WhatsApp, para que serve o encodeURIComponent()?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q8" value="A"><label>Codificar a mensagem para
+                                formato seguro de URL</label></div>
+                        <div class="option"><input type="radio" name="q8" value="B"><label>Aumentar a velocidade da
+                                internet</label></div>
+                        <div class="option"><input type="radio" name="q8" value="C"><label>Traduzir a mensagem para
+                                inglês</label></div>
+                        <div class="option"><input type="radio" name="q8" value="D"><label>Apagar a mensagem após o
+                                envio</label></div>
+                    </div>
+                </div>
+
+                <!-- Q9 -->
+                <div class="question" id="q9">
+                    <div class="question-header">
+                        <span class="question-number">9</span>
+                        Qual é a diferença do link de SMS entre Android e iOS?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q9" value="A"><label>Não há diferença</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q9" value="B"><label>Android usa ? e iOS usa &
+                                para separar o body</label></div>
+                        <div class="option"><input type="radio" name="q9" value="C"><label>iOS não aceita SMS</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q9" value="D"><label>Android só envia SMS em
+                                inglês</label></div>
+                    </div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="question" id="q10">
+                    <div class="question-header">
+                        <span class="question-number">10</span>
+                        Qual API abre o menu nativo de compartilhamento do celular?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q10" value="A"><label>navigator.send</label></div>
+                        <div class="option"><input type="radio" name="q10" value="B"><label>navigator.share</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q10" value="C"><label>navigator.open</label></div>
+                        <div class="option"><input type="radio" name="q10" value="D"><label>navigator.menu</label></div>
+                    </div>
+                </div>
+
+                <!-- Q11 -->
+                <div class="question" id="q11">
+                    <div class="question-header">
+                        <span class="question-number">11</span>
+                        Qual fórmula é usada para calcular a distância entre duas coordenadas?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q11" value="A"><label>Fórmula de Pitágoras</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q11" value="B"><label>Fórmula de Haversine</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q11" value="C"><label>Fórmula de Bhaskara</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q11" value="D"><label>Fórmula de Newton</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Q12 -->
+                <div class="question" id="q12">
+                    <div class="question-header">
+                        <span class="question-number">12</span>
+                        Qual API Web NÃO exige HTTPS para funcionar?
+                    </div>
+                    <div class="options">
+                        <div class="option"><input type="radio" name="q12"
+                                value="A"><label>navigator.geolocation</label></div>
+                        <div class="option"><input type="radio" name="q12" value="B"><label>navigator.share</label>
+                        </div>
+                        <div class="option"><input type="radio" name="q12" value="C"><label>input type="file"
+                                capture</label></div>
+                        <div class="option"><input type="radio" name="q12"
+                                value="D"><label>navigator.mediaDevices</label></div>
+                    </div>
+                </div>
+
+                <!-- Q13 (V/F) -->
+                <div class="question tf" id="q13">
+                    <div class="question-header">
+                        <span class="question-number">13</span>
+                        Um aplicativo híbrido pode acessar câmera, GPS e compartilhamento nativo sem escrever código
+                        nativo Android ou iOS.
+                    </div>
+                    <div class="options tf">
+                        <div class="option"><input type="radio" name="q13" value="V"><label>✅ Verdadeiro</label></div>
+                        <div class="option"><input type="radio" name="q13" value="F"><label>❌ Falso</label></div>
+                    </div>
+                </div>
+
+                <!-- Q14 (V/F) -->
+                <div class="question tf" id="q14">
+                    <div class="question-header">
+                        <span class="question-number">14</span>
+                        Frameworks como Capacitor e Cordova criam uma "ponte" entre o JavaScript e as APIs nativas do
+                        sistema operacional.
+                    </div>
+                    <div class="options tf">
+                        <div class="option"><input type="radio" name="q14" value="V"><label>✅ Verdadeiro</label></div>
+                        <div class="option"><input type="radio" name="q14" value="F"><label>❌ Falso</label></div>
+                    </div>
+                </div>
+
+                <!-- Q15 (V/F) -->
+                <div class="question tf" id="q15">
+                    <div class="question-header">
+                        <span class="question-number">15</span>
+                        O link sms: envia a mensagem automaticamente assim que o usuário clica, sem precisar de
+                        confirmação.
+                    </div>
+                    <div class="options tf">
+                        <div class="option"><input type="radio" name="q15" value="V"><label>✅ Verdadeiro</label></div>
+                        <div class="option"><input type="radio" name="q15" value="F"><label>❌ Falso</label></div>
+                    </div>
+                </div>
+
+                <div class="btn-grupo">
+                    <button type="button" class="btn" onclick="corrigirQuiz()">✅ Verificar Respostas</button>
+                    <button type="button" class="btn btn-secondary" onclick="limparQuiz()">🔄 Limpar Respostas</button>
+                </div>
+            </form>
+
+            <div class="result-box" id="resultadoQuiz">
+                <h3 style="color:#7c3aed;margin-bottom:8px;">📊 Resultado</h3>
+                <div class="score" id="pontuacao">0 / 15</div>
+                <p id="txtPercentual" style="font-weight:bold;color:#1e1b4b;margin-top:8px;">Aproveitamento: 0%</p>
+            </div>
+        </section>
+
+    </div>
+
+    <button class="btn-top" onclick="document.getElementById('inicio').scrollIntoView({behavior:'smooth'})">⬆️
+        Topo</button>
+
+    <script>
+        const gabarito = {
+            q1: 'B', q2: 'A', q3: 'B', q4: 'B', q5: 'B',
+            q6: 'B', q7: 'B', q8: 'A', q9: 'B', q10: 'B',
+            q11: 'B', q12: 'C', q13: 'V', q14: 'V', q15: 'F'
+        };
+
+        function corrigirQuiz() {
+            let acertos = 0;
+            for (let id in gabarito) {
+                const sel = document.querySelector('input[name="' + id + '"]:checked');
+                const qDiv = document.getElementById(id);
+                const opts = qDiv.querySelectorAll('.option');
+
+                opts.forEach(function (opt) {
+                    const r = opt.querySelector('input[type="radio"]');
+                    if (r.value === gabarito[id]) opt.classList.add('correct');
+                    else if (r.checked) opt.classList.add('wrong');
+                    r.disabled = true;
+                    opt.classList.add('disabled');
+                });
+
+                if (sel && sel.value === gabarito[id]) acertos++;
+            }
+
+            const perc = Math.round((acertos / 15) * 100);
+            document.getElementById('pontuacao').innerText = acertos + ' / 15';
+            document.getElementById('txtPercentual').innerText = 'Aproveitamento: ' + perc + '%';
+
+            const res = document.getElementById('resultadoQuiz');
+            res.style.display = 'block';
+            res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function limparQuiz() {
+            document.querySelectorAll('input[type="radio"]').forEach(function (r) {
+                r.checked = false; r.disabled = false;
+            });
+            document.querySelectorAll('.option').forEach(function (opt) {
+                opt.classList.remove('correct', 'wrong', 'disabled');
+            });
+            document.getElementById('resultadoQuiz').style.display = 'none';
+            document.getElementById('sec-quiz').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        document.querySelectorAll('.option').forEach(function (opt) {
+            opt.addEventListener('click', function () {
+                if (this.classList.contains('disabled')) return;
+                const r = this.querySelector('input[type="radio"]');
+                if (r) r.checked = true;
+            });
+        });
+    </script>
+
+</body>
+
+</html>
